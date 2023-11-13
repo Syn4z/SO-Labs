@@ -23,10 +23,10 @@ typing:				; Label for the main input loop.
 backspace_key:		; Label for handling the Backspace key.
     cmp SI, buffer	; Check if the buffer is empty.
     je typing		; If empty, go back to the input loop.
-    dec SI		; Decrement SI to move the pointer back.
+    dec SI		    ; Decrement SI to move the pointer back.
     mov byte [SI], 0	; Clear the character at the current position in the buffer.
 
-    mov AH, 0x03	; Set AH to 0x03 (get cursor position).
+    mov AH, 03h	    ; Get cursor position.
     mov BH, 0		; Set BH to 0 (video page).
     int 0x10		; Get the current cursor position.
 
@@ -35,33 +35,33 @@ backspace_key:		; Label for handling the Backspace key.
     jmp last_character	; Otherwise, move the cursor to the previous character position.
 
 last_character:		; Label for moving the cursor to the previous character position.
-    mov AH, 0x02	; Set AH to 0x02 (set cursor position).
-    dec DL		; Decrement DL (column) to move left.
+    mov AH, 02h	    ; Set cursor position.
+    dec DL		    ; Decrement DL (column) to move left.
     int 0x10		; Set the new cursor position.
     jmp space_character	; Jump to space character handling.
 
-last_line:		; Label for moving the cursor to the previous line.
-    mov AH, 0x02	; Set AH to 0x02 (set cursor position).
+last_line:		    ; Label for moving the cursor to the previous line.
+    mov AH, 02h	    ; Set cursor position.
     mov DL, 79		; Set DL (column) to 79 (end of line).
     dec DH		; Decrement DH (row) to move up one line.
     int 0x10		; Set the new cursor position.
 
 space_character:	; Label for handling space character.
-    mov AH, 0xa		; Set AH to 0xa (teletype output).
+    mov AH, 0Ah		; Set AH to 0xa (teletype output).
     mov AL, 0x20	; Set AL to 0x20 (space character).
     mov CX, 1		; Set CX to 1 (number of repetitions).
     int 0x10		; Display the space character.
     jmp typing		; Continue reading user input.
 
-enter_key:		; Label for handling the Enter key.
-    mov AH, 0x03	; Set AH to 0x03 (get cursor position).
+enter_key:		    ; Label for handling the Enter key.
+    mov AH, 03h	    ; Get cursor position.
     mov BH, 0		; Set BH to 0 (video page).
     int 0x10		; Get the current cursor position.
 
     sub SI, buffer	; Calculate the difference between SI and the buffer address.
     jz insert_line	; If SI equals the buffer address, jump to insert_line.
 
-    mov AH, 0x03	; Set AH to 0x03 (get cursor position).
+    mov AH, 03h	    ; Get cursor position.
     mov BH, 0		; Set BH to 0 (video page).
     int 0x10		; Get the current cursor position.
 
@@ -87,14 +87,14 @@ print_echo:		; Label for printing characters to the screen.
     inc DH		; Increment DH to move to the next row.
     mov DL, 0		; Set DL to 0 (column).
 
-    mov AX, 0x1301	; Set AX to 0x1301 (teletype output, update cursor).
+    mov AX, 1301h	; Set AX to 1301h (teletype output, update cursor).
     int 0x10		; Display the character and update the cursor.
 
 insert_line:		; Label for inserting a new line.
     cmp DH, 24		; Check if DH (row) is 24 (last row).
     je scroll_down	; If so, jump to scroll_down.
 
-    mov AH, 0x03	; Set AH to 0x03 (get cursor position).
+    mov AH, 03h	    ; Get cursor position.
     mov BH, 0		; Set BH to 0 (video page).
     int 0x10		; Get the current cursor position.
     jmp cursor_down	; Continue moving the cursor down.
@@ -109,7 +109,7 @@ scroll_down:		; Label for scrolling down the screen.
     mov DH, 0x17	; Set DH to 0x17 (last visible row).
 
 cursor_down:		; Label for moving the cursor down by one line.
-    mov AH, 0x02	; Set AH to 0x02 (set cursor position).
+    mov AH, 02h	    ; Set cursor position.
     mov BH, 0		; Set BH to 0 (video page).
     inc DH		; Increment DH to move down one row.
     mov DL, 0		; Set DL to 0 (column).
