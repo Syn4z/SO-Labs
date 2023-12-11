@@ -2,6 +2,10 @@ org 7d00h
 
 mov byte [marker], 0
 
+mov al, 0x3            
+mov ah, 0            
+int 0x10
+
 ; print initial prompt
 mov si, prompt
 call print
@@ -349,7 +353,7 @@ newline:
 
 section .data:
     prompt db 'Welcome, Sorin. Press any key to continue: $'
-    hts_prompt db "Enter CHTS script address$"
+    hts_prompt db "Enter n, SIDE, TRACK, SECTOR$"
     so_prompt db "Enter XXXX:YYYY RAM address$"
     kernel_start db "Press any key to load the kernel: $"
 

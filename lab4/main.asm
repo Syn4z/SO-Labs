@@ -18,6 +18,9 @@ typing:				; Label for the main input loop.
     cmp AL, 0x20	; Check if the entered character is a space or a printable character.
     jge print_character	; If yes, jump to the "print_character" label.
 
+    cmp AL, 1bh
+    je exit		; If the entered character is the Escape key, jump to the "exit" label.
+
     jmp typing		; Otherwise, continue reading user keyboard inputs.
 
 backspace_key:		; Label for handling the Backspace key.
@@ -176,6 +179,27 @@ increment_n_buffer:   ; Label for incrementing the n buffer.
     int 10h		; Display the entered character.
 
     jmp typing      ; Continue reading user input.
+
+exit:
+    mov ah, 00
+    int 13h
+
+    mov ax, 0000h
+    mov es, ax
+    mov bx, 7d00h
+
+    mov ah, 02h
+    mov al, 2
+    mov ch, 0
+    mov cl, 2
+    mov dh, 0
+    mov dl, 0
+    int 13h
+
+    jmp 0000h:7d00h
+
+    times 510-($-$$) db 0
+    dw 0AA55h    
 
 buffer: times 256 db 0x0	; Define a buffer of 256 bytes, initialized with null characters.
 n: db 0
